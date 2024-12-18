@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: library-deployment
+spec:
+  replicas: 5 # Number of replicas
+  selector:
+    matchLabels:
+      app: library
+  template:
+    metadata:
+      labels:
+        app: library
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: pass
+            - name: POSTGRES_DB
+              value: db_library
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: data-library
+          ports:
+            - containerPort: 5432
+        - name: pgadmin
+          image: dpage/pgadmin4:latest
+          env:
+            - name: PGADMIN_DEFAULT_EMAIL
+              value: unedo@gmail.com
+            - name: PGADMIN_DEFAULT_PASSWORD
+              value: pass
+          ports:
+            - containerPort: 80
+        - name: webserver
+          image: unedotamps/library-image
+          env:
+            - name: DB_NAME
+              value: db_library
+            - name: DB_HOST
+              value: localhost
+            - name: DB_USERNAME
+              value: postgres
+            - name: DB_PASSWORD
+              value: pass
+          ports:
+            - containerPort: 443
+            - containerPort: 9000
+      volumes:
+        - name: data-library
+          persistentVolumeClaim:
+            claimName: postgres-pvc

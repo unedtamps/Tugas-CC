@@ -1,0 +1,17 @@
+services:
+  webserver:
+    image: nginx:1.15.12-alpine
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "8081:443"
+      - "8080:80"
+    volumes:
+      - ./certs:/certs
+      - ./html:/var/www/html
+      - ./nginx-conf/nginx.secure.conf:/etc/nginx/conf.d/nginx.conf
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,78 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_trivia_compose
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: trivia_db
+    networks:
+      - trivia_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_trivia_compose
+    environment:
+      PGADMIN_DEFAULT_EMAIL: unedo@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: pass
+    networks:
+      - trivia_network
+    ports:
+      - "5050:80"
+  web1:
+    image: golang:alpine
+    container_name: triva-docker_compose_1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_NAME: trivia_db
+      DB_HOST: postgres_trivia_compose
+      DB_USERNAME: postgres
+      DB_PASSWORD: pass
+    networks:
+      - trivia_network
+    volumes:
+      - ./web1:/app
+    working_dir: /app
+    entrypoint: sh -c "./wait-for-postgres.sh && go mod tidy && go run main.go"
+  web2:
+    image: golang:alpine
+    container_name: triva-docker_compose_2
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_NAME: trivia_db
+      DB_HOST: postgres_trivia_compose
+      DB_USERNAME: postgres
+      DB_PASSWORD: pass
+    networks:
+      - trivia_network
+    volumes:
+      - ./web2:/app
+    working_dir: /app
+    entrypoint: sh -c "./wait-for-postgres.sh && go mod tidy && go run main.go"
+  nginx:
+    image: nginx:latest
+    container_name: nginx_load_balancer
+    depends_on:
+      - web1
+      - web2
+    networks:
+      - trivia_network
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ./certs:/etc/nginx/certs:ro
+    ports:
+      - "8080:443"
+networks:
+  trivia_network:
+volumes:
+  postgres_data:

@@ -1,0 +1,8 @@
+- name: Restart MySQL Service
+  service:
+    name: mysql
+    state: restarted
+- name: Restart Apache Server
+  service:
+    name: apache2
+    state: restarted

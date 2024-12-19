@@ -1,0 +1,5 @@
+[dbvm0]
+192.168.158.48 ansible_user="ubuntu"
+
+[webvm0]
+192.168.158.174 ansible_user="ubuntu"

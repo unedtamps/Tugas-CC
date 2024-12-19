@@ -1,0 +1,11 @@
+# ansible-playbook.yml
+- name: Deploy Website
+  hosts: webvm0
+  become: yes
+  roles:
+    - web
+- name: Setup Database and PHPmyadmin
+  hosts: dbvm0
+  become: yes
+  roles:
+    - database

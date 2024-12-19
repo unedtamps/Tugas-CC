@@ -1,0 +1,6 @@
+export TF_VAR_db_vm_name="db_vm0"
+export TF_VAR_db_vm_memory=2048
+export TF_VAR_db_vm_vcpus=1
+export TF_VAR_web_vm_name="web_vm0"
+export TF_VAR_web_vm_memory=2048
+export TF_VAR_web_vm_vcpus=1

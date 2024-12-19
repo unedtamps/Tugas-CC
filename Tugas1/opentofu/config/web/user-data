@@ -1,0 +1,14 @@
+#cloud-config
+ssh_pwauth: true
+chpasswd:
+  list: |
+    root:password
+  expire: false
+users:
+  - name: ubuntu
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2zDKRBgNuHU1lAR0SqW3kUpOWjC3X3FDD9OoLIA1fSaQ8aXMsLYC7VtD1MNczV+IFSSrxHSLcdhk66FpLWwPUrFni3+qjfq9E8C4QzKsIOhodXVl+JVY8i4oRdRQPkcNVMQ78U4p6zTnK7VK6zShUnCK8CCiYxX73iS4MWm6YxGtbaaWUpycMva/SLBhK3Twb8rdIOGbJzG6Q+Dixj7OpbZkuZHbgib6aTUxri/wypNxXReirGNR8Zr/9yFQYdJavOJeC5ja8QnTtDMI7cUCUgR8N6GiLb2H+at7H1tmaqqQ7XY/Na4fMCOZSAMww0+0F9u+hPO5EpQmmXNyE9z2YC99jq6xTHPazgbnOQty7cLW75eJT/4LWAGkZf3Y5Wu8cWD3uld2JPzCOtDLhJfq/L1UVHpt0luT1YLwvPU2fXXkFpf7rG1aSg3SjsxEfMtDKf5GrglW/dJbb07Af3Er7BipvdZXb9mD4Hnce7CDdEdipyreOKkxlxi0h0Jzllxc= unedotamps@mylaptop
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: sudo
+    shell: /bin/bash
+    lock_passwd: false

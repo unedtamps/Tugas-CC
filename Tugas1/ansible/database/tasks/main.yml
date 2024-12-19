@@ -1,0 +1,68 @@
+- name: Update apt cache
+  apt:
+    update_cache: yes
+- name: Install MySQL server
+  apt:
+    name: mysql-server
+    state: present
+- name: Set MySQL root password
+  debconf:
+    name: "mysql-server"
+    question: "mysql-server/root_password"
+    value: "root"
+    vtype: "string"
+- name: Confirm MySQL root password
+  debconf:
+    name: "mysql-server"
+    question: "mysql-server/root_password_again"
+    value: "root"
+    vtype: "string"
+- name: Configure MySQL root user to use mysql_native_password
+  shell: |
+    mysql -uroot -proot -e "
+    ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
+    FLUSH PRIVILEGES;"
+  notify: Restart MySQL Service
+- name: Ensure root has full privileges
+  shell: |
+    mysql -uroot -proot -e "
+    GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
+    FLUSH PRIVILEGES;"
+  notify: Restart MySQL Service
+- name: Install PHP and required extensions
+  apt:
+    name:
+      - php
+      - php-mysql
+      - apache2
+      - libapache2-mod-php
+    state: present
+  notify: Restart Apache Server
+- name: Preconfigure phpMyAdmin for Apache
+  debconf:
+    name: phpmyadmin
+    question: phpmyadmin/reconfigure-webserver
+    value: "apache2"
+    vtype: multiselect
+- name: Set phpMyAdmin MySQL app password
+  debconf:
+    name: phpmyadmin
+    question: phpmyadmin/mysql/app-pass
+    value: "password"
+    vtype: password
+- name: Confirm phpMyAdmin MySQL app password
+  debconf:
+    name: phpmyadmin
+    question: phpmyadmin/mysql/admin-pass
+    value: "root"
+    vtype: password
+- name: Install phpMyAdmin
+  apt:
+    name: phpmyadmin
+    state: present
+  notify: Restart Apache Server
+- name: Allow HTTP port 80 through UFW
+  ufw:
+    rule: allow
+    port: 80
+    proto: tcp
